@@ -8,10 +8,54 @@ const bodyParser = require('body-parser');
 
 const app = express()
 
+import { FBXLoader } from '@loaders.gl/fbx';
+
+const loader = new FBXLoader();
+
+  
+  
+
 app.use(bodyParser.urlencoded({ extended: false}));
 
 //parse app/json
 app.use(bodyParser.json());
+
+
+
+app.get('/model.fbx', (req, res) => {
+    // Charger le modèle FBX
+    const model = new THREE.FBXLoader().load('model.fbx');
+  
+    // Créer une scène et une caméra
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+  
+    // Ajouter le modèle à la scène
+    scene.add(model);
+  
+    // Positionner la caméra
+    camera.position.z = 500;
+  
+    // Créer un rendu
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  
+    // Ajouter le rendu à la page
+    document.body.appendChild(renderer.domElement);
+  
+    // Animer la scène
+    function animate() {
+      requestAnimationFrame(animate);
+  
+      renderer.render(scene, camera);
+    }
+  
+    animate();
+  
+    // Envoyer le modèle à la réponse
+    res.send(model);
+  });
+
 
 app.get('/continents', async(req,res)=>{
   try{  
