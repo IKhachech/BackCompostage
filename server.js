@@ -75,7 +75,7 @@ mongoose.connect("mongodb+srv://imenekhachech:imene7530khachech@cluster0.adv5y50
     console.error('MongoDB connection error:', err);
   });
 
-
-app.listen(3030,()=>console.log("serveur en marche"))
+const PORT = process.env.PORT || 5000
+app.listen(5000,()=>console.log("serveur en marche"))
 
 // mongodb+srv://imenekhachech:<password>@cluster0.adv5y50.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
