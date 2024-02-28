@@ -17,6 +17,36 @@ app.use(bodyParser.json());
 
 
 
+app.get("/continent/:nom/dechets_3D", async (req, res) => {
+  try {
+    const { nom } = req.params;
+    const continent = await Continent.findOne({ nom });
+
+    if (!continent) {
+      return res.status(404).send("Continent non trouvé");
+    }
+
+    const dechetsAzote = continent.dechets_riches_en_azote.map(dechet => ({
+      nom: dechet.nom,
+      lien_3D: dechet.lien_3D
+    }));
+
+    const dechetsCarbone = continent.dechets_riches_en_carbone.map(dechet => ({
+      nom: dechet.nom,
+      lien_3D: dechet.lien_3D
+    }));
+
+    res.json({ 
+      dechets_riches_en_azote: dechetsAzote,
+      dechets_riches_en_carbone: dechetsCarbone
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erreur serveur");
+  }
+});
+
+
 
 app.get('/continents', async(req,res)=>{
   try{  
@@ -45,27 +75,29 @@ app.get("/continents/:nom", async (req, res) => {
   
 
 
-app.post('/ajouterContinent', async (req, res) => {
+  app.post('/ajouterContinent', async (req, res) => {
     try {
-        // Récupération des données du corps de la requête
-        const { nom, types_de_dechets, traitements, dechets_riches_en_azote, dechets_riches_en_carbone } = req.body;
-    
-        // Création d'un nouveau continent
-        const nouveauContinent = new Continent({
-          nom,
-          types_de_dechets,
-          traitements,
-          dechets_riches_en_azote,
-          dechets_riches_en_carbone,
-        });
+      // Validate the request body data (optional)
+      if (!req.body.nom || !req.body.id || !req.body.model || !req.body.Richesse) {
+        return res.status(400).send({ message: 'Missing required fields in request body' });
+      }
   
-      // Enregistrement du nouveau continent dans la base de données
+      // Create a new continent with input data
+      const nouveauContinent = new Continent({
+        nom: req.body.nom,
+        id: req.body.id,
+        model: req.body.model,
+        Richesse: req.body.Richesse,
+      });
+  
+      // Save the new continent to the database
       await nouveauContinent.save();
   
-      // Envoi d'une réponse de succès
-      res.send({ message: "Nouveau continent ajouté avec succès" });
+      // Send a success response
+      res.send({ message: 'Nouveau continent ajouté avec succès' });
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      res.status(500).send({ message: 'Erreur ajout du continent' });
     }
   });
   
